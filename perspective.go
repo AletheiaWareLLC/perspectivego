@@ -104,29 +104,29 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 				Name:     parts[1],
 				Mesh:     parts[2],
 				Colour:   parts[3],
-				Location: ParseLocation(parts[4]),
+				Location: StringToLocation(parts[4]),
 			})
 		case "goal":
 			goal = append(goal, &Goal{
 				Name:     parts[1],
 				Mesh:     parts[2],
 				Colour:   parts[3],
-				Location: ParseLocation(parts[4]),
+				Location: StringToLocation(parts[4]),
 			})
 		case "portal":
 			portal = append(portal, &Portal{
 				Name:     parts[1],
 				Mesh:     parts[2],
 				Colour:   parts[3],
-				Location: ParseLocation(parts[4]),
-				Link:     ParseLocation(parts[5]),
+				Location: StringToLocation(parts[4]),
+				Link:     StringToLocation(parts[5]),
 			})
 		case "sphere":
 			sphere = append(sphere, &Sphere{
 				Name:     parts[1],
 				Mesh:     parts[2],
 				Colour:   parts[3],
-				Location: ParseLocation(parts[4]),
+				Location: StringToLocation(parts[4]),
 			})
 		}
 	}
@@ -140,7 +140,7 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 	}, nil
 }
 
-func ParseLocation(s string) *Location {
+func StringToLocation(s string) *Location {
 	parts := strings.Split(s, ",")
 	w := 0
 	x := 0
@@ -182,11 +182,11 @@ func StringToInt(s string) int {
 	return index
 }
 
-func UnparseLocation(l *Location) string {
-	if l.W != 0 {
-		return strconv.Itoa(int(l.W)) + "," + strconv.Itoa(int(l.X)) + "," + strconv.Itoa(int(l.Y)) + "," + strconv.Itoa(int(l.Z))
+func LocationToString(l *Location) string {
+	if l.W == 0 {
+		return strconv.Itoa(int(l.X)) + "," + strconv.Itoa(int(l.Y)) + "," + strconv.Itoa(int(l.Z))
 	}
-	return strconv.Itoa(int(l.X)) + "," + strconv.Itoa(int(l.Y)) + "," + strconv.Itoa(int(l.Z))
+	return strconv.Itoa(int(l.W)) + "," + strconv.Itoa(int(l.X)) + "," + strconv.Itoa(int(l.Y)) + "," + strconv.Itoa(int(l.Z))
 }
 
 func WritePuzzleFile(path string, puzzle *Puzzle) error {
@@ -206,16 +206,16 @@ func WritePuzzle(writer io.Writer, puzzle *Puzzle) error {
 		fmt.Fprintln(writer, "description:"+puzzle.Description)
 	}
 	for _, b := range puzzle.Block {
-		fmt.Fprintln(writer, "block:"+b.Name+":"+b.Mesh+":"+b.Colour+":"+UnparseLocation(b.Location))
+		fmt.Fprintln(writer, "block:"+b.Name+":"+b.Mesh+":"+b.Colour+":"+LocationToString(b.Location))
 	}
 	for _, g := range puzzle.Goal {
-		fmt.Fprintln(writer, "goal:"+g.Name+":"+g.Mesh+":"+g.Colour+":"+UnparseLocation(g.Location))
+		fmt.Fprintln(writer, "goal:"+g.Name+":"+g.Mesh+":"+g.Colour+":"+LocationToString(g.Location))
 	}
 	for _, p := range puzzle.Portal {
-		fmt.Fprintln(writer, "portal:"+p.Name+":"+p.Mesh+":"+p.Colour+":"+UnparseLocation(p.Location)+":"+UnparseLocation(p.Link))
+		fmt.Fprintln(writer, "portal:"+p.Name+":"+p.Mesh+":"+p.Colour+":"+LocationToString(p.Location)+":"+LocationToString(p.Link))
 	}
 	for _, s := range puzzle.Sphere {
-		fmt.Fprintln(writer, "sphere:"+s.Name+":"+s.Mesh+":"+s.Colour+":"+UnparseLocation(s.Location))
+		fmt.Fprintln(writer, "sphere:"+s.Name+":"+s.Mesh+":"+s.Colour+":"+LocationToString(s.Location))
 	}
 	return nil
 }
