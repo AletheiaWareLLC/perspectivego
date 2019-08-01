@@ -85,6 +85,7 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 	var portal []*Portal
 	var sphere []*Sphere
 	var description string
+	var target int
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" || strings.HasPrefix(line, "#") {
@@ -94,6 +95,8 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 		switch parts[0] {
 		case "description":
 			description = parts[1]
+		case "target":
+			target = StringToInt(parts[1])
 		case "outline":
 			outline = &Outline{
 				Mesh:   parts[1],
@@ -137,6 +140,7 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 		Portal:      portal,
 		Sphere:      sphere,
 		Description: description,
+		Target:      uint32(target),
 	}, nil
 }
 
@@ -199,6 +203,7 @@ func WritePuzzleFile(path string, puzzle *Puzzle) error {
 }
 
 func WritePuzzle(writer io.Writer, puzzle *Puzzle) error {
+	fmt.Fprintln(writer, "target:"+string(puzzle.Target))
 	if puzzle.Outline != nil {
 		fmt.Fprintln(writer, "outline:"+puzzle.Outline.Mesh+":"+puzzle.Outline.Colour)
 	}
