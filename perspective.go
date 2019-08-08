@@ -203,7 +203,7 @@ func WritePuzzleFile(path string, puzzle *Puzzle) error {
 }
 
 func WritePuzzle(writer io.Writer, puzzle *Puzzle) error {
-	fmt.Fprintln(writer, "target:"+string(puzzle.Target))
+	fmt.Fprintln(writer, "target:"+fmt.Sprint(puzzle.Target))
 	if puzzle.Outline != nil {
 		fmt.Fprintln(writer, "outline:"+puzzle.Outline.Mesh+":"+puzzle.Outline.Colour)
 	}
