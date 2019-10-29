@@ -131,6 +131,8 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 				Colour:   parts[3],
 				Location: StringToLocation(parts[4]),
 			})
+		default:
+			log.Println("Unrecognized line:", line)
 		}
 	}
 	return &Puzzle{
