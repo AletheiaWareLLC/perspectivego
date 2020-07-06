@@ -99,8 +99,11 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 			target = StringToInt(parts[1])
 		case "outline":
 			outline = &Outline{
-				Mesh:   parts[1],
-				Colour: parts[2],
+				Mesh:     parts[1],
+				Colour:   parts[2],
+				Texture:  parts[3],
+				Material: parts[4],
+				Shader:   parts[5],
 			}
 		case "block":
 			block = append(block, &Block{
@@ -108,6 +111,9 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 				Mesh:     parts[2],
 				Colour:   parts[3],
 				Location: StringToLocation(parts[4]),
+				Texture:  parts[5],
+				Material: parts[6],
+				Shader:   parts[7],
 			})
 		case "goal":
 			goal = append(goal, &Goal{
@@ -115,6 +121,9 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 				Mesh:     parts[2],
 				Colour:   parts[3],
 				Location: StringToLocation(parts[4]),
+				Texture:  parts[5],
+				Material: parts[6],
+				Shader:   parts[7],
 			})
 		case "portal":
 			portal = append(portal, &Portal{
@@ -123,6 +132,9 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 				Colour:   parts[3],
 				Location: StringToLocation(parts[4]),
 				Link:     StringToLocation(parts[5]),
+				Texture:  parts[6],
+				Material: parts[7],
+				Shader:   parts[8],
 			})
 		case "sphere":
 			sphere = append(sphere, &Sphere{
@@ -130,6 +142,9 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 				Mesh:     parts[2],
 				Colour:   parts[3],
 				Location: StringToLocation(parts[4]),
+				Texture:  parts[5],
+				Material: parts[6],
+				Shader:   parts[7],
 			})
 		default:
 			log.Println("Unrecognized line:", line)
@@ -207,22 +222,22 @@ func WritePuzzleFile(path string, puzzle *Puzzle) error {
 func WritePuzzle(writer io.Writer, puzzle *Puzzle) error {
 	fmt.Fprintln(writer, "target:"+fmt.Sprint(puzzle.Target))
 	if puzzle.Outline != nil {
-		fmt.Fprintln(writer, "outline:"+puzzle.Outline.Mesh+":"+puzzle.Outline.Colour)
+		fmt.Fprintln(writer, "outline:"+puzzle.Outline.Mesh+":"+puzzle.Outline.Colour+":"+puzzle.Outline.Texture+":"+puzzle.Outline.Material+":"+puzzle.Outline.Shader)
 	}
 	if puzzle.Description != "" {
 		fmt.Fprintln(writer, "description:"+puzzle.Description)
 	}
 	for _, b := range puzzle.Block {
-		fmt.Fprintln(writer, "block:"+b.Name+":"+b.Mesh+":"+b.Colour+":"+LocationToString(b.Location))
+		fmt.Fprintln(writer, "block:"+b.Name+":"+b.Mesh+":"+b.Colour+":"+LocationToString(b.Location)+":"+b.Texture+":"+b.Material+":"+b.Shader)
 	}
 	for _, g := range puzzle.Goal {
-		fmt.Fprintln(writer, "goal:"+g.Name+":"+g.Mesh+":"+g.Colour+":"+LocationToString(g.Location))
+		fmt.Fprintln(writer, "goal:"+g.Name+":"+g.Mesh+":"+g.Colour+":"+LocationToString(g.Location)+":"+g.Texture+":"+g.Material+":"+g.Shader)
 	}
 	for _, p := range puzzle.Portal {
-		fmt.Fprintln(writer, "portal:"+p.Name+":"+p.Mesh+":"+p.Colour+":"+LocationToString(p.Location)+":"+LocationToString(p.Link))
+		fmt.Fprintln(writer, "portal:"+p.Name+":"+p.Mesh+":"+p.Colour+":"+LocationToString(p.Location)+":"+LocationToString(p.Link)+":"+p.Texture+":"+p.Material+":"+p.Shader)
 	}
 	for _, s := range puzzle.Sphere {
-		fmt.Fprintln(writer, "sphere:"+s.Name+":"+s.Mesh+":"+s.Colour+":"+LocationToString(s.Location))
+		fmt.Fprintln(writer, "sphere:"+s.Name+":"+s.Mesh+":"+s.Colour+":"+LocationToString(s.Location)+":"+s.Texture+":"+s.Material+":"+s.Shader)
 	}
 	return nil
 }
