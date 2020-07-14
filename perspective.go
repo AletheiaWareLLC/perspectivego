@@ -80,12 +80,15 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 	scanner.Split(bufio.ScanLines)
 
 	var outline *Outline
+	var sky *Sky
 	var block []*Block
 	var goal []*Goal
 	var portal []*Portal
 	var sphere []*Sphere
 	var description string
 	var target int
+	var scenery []*Scenery
+	var dialog []*Dialog
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" || strings.HasPrefix(line, "#") {
@@ -99,6 +102,14 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 			target = StringToInt(parts[1])
 		case "outline":
 			outline = &Outline{
+				Mesh:     parts[1],
+				Colour:   parts[2],
+				Texture:  parts[3],
+				Material: parts[4],
+				Shader:   parts[5],
+			}
+		case "sky":
+			sky = &Sky{
 				Mesh:     parts[1],
 				Colour:   parts[2],
 				Texture:  parts[3],
@@ -146,18 +157,42 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 				Material: parts[6],
 				Shader:   parts[7],
 			})
+		case "scenery":
+			scenery = append(scenery, &Scenery{
+				Name:     parts[1],
+				Mesh:     parts[2],
+				Colour:   parts[3],
+				Location: StringToLocation(parts[4]),
+				Texture:  parts[5],
+				Material: parts[6],
+				Shader:   parts[7],
+			})
+		case "dialog":
+			dialog = append(dialog, &Dialog{
+				Name:             parts[1],
+				Type:             parts[2],
+				BackgroundColour: parts[3],
+				ForegroundColour: parts[4],
+				Author:           parts[5],
+				Content:          parts[6],
+				Location:         StringToLocation(parts[7]),
+				Element:          strings.Split(parts[8], ","),
+			})
 		default:
 			log.Println("Unrecognized line:", line)
 		}
 	}
 	return &Puzzle{
 		Outline:     outline,
+		Sky:         sky,
 		Block:       block,
 		Goal:        goal,
 		Portal:      portal,
 		Sphere:      sphere,
 		Description: description,
 		Target:      uint32(target),
+		Scenery:     scenery,
+		Dialog:      dialog,
 	}, nil
 }
 
@@ -224,6 +259,9 @@ func WritePuzzle(writer io.Writer, puzzle *Puzzle) error {
 	if puzzle.Outline != nil {
 		fmt.Fprintln(writer, "outline:"+puzzle.Outline.Mesh+":"+puzzle.Outline.Colour+":"+puzzle.Outline.Texture+":"+puzzle.Outline.Material+":"+puzzle.Outline.Shader)
 	}
+	if puzzle.Sky != nil {
+		fmt.Fprintln(writer, "sky:"+puzzle.Sky.Mesh+":"+puzzle.Sky.Colour+":"+puzzle.Sky.Texture+":"+puzzle.Sky.Material+":"+puzzle.Sky.Shader)
+	}
 	if puzzle.Description != "" {
 		fmt.Fprintln(writer, "description:"+puzzle.Description)
 	}
@@ -238,6 +276,12 @@ func WritePuzzle(writer io.Writer, puzzle *Puzzle) error {
 	}
 	for _, s := range puzzle.Sphere {
 		fmt.Fprintln(writer, "sphere:"+s.Name+":"+s.Mesh+":"+s.Colour+":"+LocationToString(s.Location)+":"+s.Texture+":"+s.Material+":"+s.Shader)
+	}
+	for _, s := range puzzle.Scenery {
+		fmt.Fprintln(writer, "scenery:"+s.Name+":"+s.Mesh+":"+s.Colour+":"+LocationToString(s.Location)+":"+s.Texture+":"+s.Material+":"+s.Shader)
+	}
+	for _, d := range puzzle.Dialog {
+		fmt.Fprintln(writer, "dialog:"+d.Name+":"+d.Type+":"+d.BackgroundColour+":"+d.ForegroundColour+":"+d.Author+":"+d.Content+":"+LocationToString(d.Location)+":"+strings.Join(d.Element, ","))
 	}
 	return nil
 }
