@@ -80,7 +80,7 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 	scanner.Split(bufio.ScanLines)
 
 	var outline *Outline
-	var sky *Sky
+	var sky []*Sky
 	var block []*Block
 	var goal []*Goal
 	var portal []*Portal
@@ -109,13 +109,14 @@ func ReadPuzzle(reader io.Reader) (*Puzzle, error) {
 				Shader:   parts[5],
 			}
 		case "sky":
-			sky = &Sky{
-				Mesh:     parts[1],
-				Colour:   parts[2],
-				Texture:  parts[3],
-				Material: parts[4],
-				Shader:   parts[5],
-			}
+			sky = append(sky, &Sky{
+				Name:     parts[1],
+				Mesh:     parts[2],
+				Colour:   parts[3],
+				Texture:  parts[4],
+				Material: parts[5],
+				Shader:   parts[6],
+			})
 		case "block":
 			block = append(block, &Block{
 				Name:     parts[1],
@@ -259,8 +260,8 @@ func WritePuzzle(writer io.Writer, puzzle *Puzzle) error {
 	if puzzle.Outline != nil {
 		fmt.Fprintln(writer, "outline:"+puzzle.Outline.Mesh+":"+puzzle.Outline.Colour+":"+puzzle.Outline.Texture+":"+puzzle.Outline.Material+":"+puzzle.Outline.Shader)
 	}
-	if puzzle.Sky != nil {
-		fmt.Fprintln(writer, "sky:"+puzzle.Sky.Mesh+":"+puzzle.Sky.Colour+":"+puzzle.Sky.Texture+":"+puzzle.Sky.Material+":"+puzzle.Sky.Shader)
+	for _, s := range puzzle.Sky {
+		fmt.Fprintln(writer, "sky:"+s.Name+":"+s.Mesh+":"+s.Colour+":"+s.Texture+":"+s.Material+":"+s.Shader)
 	}
 	if puzzle.Description != "" {
 		fmt.Fprintln(writer, "description:"+puzzle.Description)
